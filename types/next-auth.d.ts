@@ -1,3 +1,5 @@
+declare module "lucide-react";
+
 import "next-auth";
 import "next-auth/jwt";
 
