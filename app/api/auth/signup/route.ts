@@ -6,12 +6,11 @@ import { generateToken, getVerificationExpiry } from "@/lib/tokens";
 import { sendEmail } from "@/lib/mailer";
 import { VerificationEmail } from "@/emails/VerificationEmail";
 import { signupLimiter } from "@/lib/rate-limit";
-import { headers } from "next/headers";
 import * as React from "react";
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
     const { success } = await signupLimiter.limit(ip);
 
     if (!success) {
@@ -21,7 +20,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
+    const body = await request.json();
     const validatedFields = SignUpSchema.safeParse(body);
 
     if (!validatedFields.success) {

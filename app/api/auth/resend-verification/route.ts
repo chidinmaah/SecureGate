@@ -4,15 +4,14 @@ import { generateToken, getVerificationExpiry } from "@/lib/tokens";
 import { sendEmail } from "@/lib/mailer";
 import { VerificationEmail } from "@/emails/VerificationEmail";
 import { resendVerificationLimiter } from "@/lib/rate-limit";
-import { headers } from "next/headers";
 import * as React from "react";
 import { z } from "zod";
 
 const EmailSchema = z.string().email("Invalid email address");
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
     const { success } = await resendVerificationLimiter.limit(ip);
 
     if (!success) {
@@ -22,7 +21,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
+    const body = await request.json();
     const { email } = body;
 
     if (!email || typeof email !== "string") {

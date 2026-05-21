@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import db from "@/lib/db";
 import { z } from "zod";
 import { resetPasswordLimiter } from "@/lib/rate-limit";
-import { headers } from "next/headers";
 import { PasswordSchema } from "@/lib/validations";
 
 const RequestSchema = z.object({
@@ -11,9 +10,9 @@ const RequestSchema = z.object({
   password: PasswordSchema,
 });
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
     const { success } = await resetPasswordLimiter.limit(ip);
 
     if (!success) {
@@ -23,7 +22,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
+    const body = await request.json();
     const parsed = RequestSchema.safeParse(body);
 
     if (!parsed.success) {
