@@ -1,0 +1,22 @@
+{
+  "brand": {
+    "primary": "#1E3A5F",
+    "primaryHover": "#16304F",
+    "accent": "#2E75B6"
+  },
+  "neutrals": {
+    "bg": "#F9FAFB",
+    "surface": "#FFFFFF",
+    "border": "#E5E7EB",
+    "muted": "#6B7280",
+    "text": "#111827"
+  },
+  "feedback": {
+    "success": "#16A34A",
+    "successBg": "#F0FDF4",
+    "error": "#DC2626",
+    "errorBg": "#FEF2F2",
+    "warning": "#D97706",
+    "warningBg": "#FFFBEB"
+  }
+}

@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1E3A5F;
+  --color-primary-hover: #16304F;
+  --color-accent: #2E75B6;
+  --color-bg: #F9FAFB;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-muted: #6B7280;
+  --color-text: #111827;
+  --color-success: #16A34A;
+  --color-success-bg: #F0FDF4;
+  --color-error: #DC2626;
+  --color-error-bg: #FEF2F2;
+  --color-warning: #D97706;
+  --color-warning-bg: #FFFBEB;
+
+  /* Typography Scale (Material 3 derived) */
+  --display-large: 57px;
+  --display-medium: 45px;
+  --display-small: 36px;
+  --headline-large: 32px;
+  --headline-medium: 28px;
+  --headline-small: 24px;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+}
+
+@layer components {
+  .auth-card {
+    @apply max-w-[400px] w-full bg-surface border border-border rounded-[12px] shadow-sm p-6 md:p-8;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .input-field {
+    @apply w-full p-3 border border-border rounded-lg text-sm focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all;
+  }
+}
