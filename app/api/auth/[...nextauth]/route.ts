@@ -3,9 +3,9 @@ import NextAuth from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { loginLimiter } from "@/lib/rate-limit";
 
-const { GET, POST: nextAuthPOST } = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
 
-export { GET };
+export { handler as GET };
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
@@ -18,5 +18,5 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return nextAuthPOST(request);
+  return handler(request);
 }
