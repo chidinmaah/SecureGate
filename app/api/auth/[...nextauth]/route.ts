@@ -5,9 +5,17 @@ import { loginLimiter } from "@/lib/rate-limit";
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET };
+export async function GET(
+  request: NextRequest,
+  context: { params: { nextauth: string[] } }
+) {
+  return handler(request, context);
+}
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  context: { params: { nextauth: string[] } }
+) {
   const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
   const { success } = await loginLimiter.limit(ip);
 
@@ -18,5 +26,5 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return handler(request);
+  return handler(request, context);
 }
