@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
+import SessionProvider from "@/components/SessionProvider";
 
 const interTight = Inter_Tight({ 
   subsets: ["latin"],
