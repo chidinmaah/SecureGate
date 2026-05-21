@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     
     if (!success) {
       return NextResponse.json(
-        { error: "Too many attempts. Please try again later" },
+        { error: "Too many attempts. Please try again in 10 minutes" },
         { status: 429 }
       );
     }
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     });
 
     // 6. Send Email (non-blocking)
-    const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password/${resetToken}`;
     
     sendEmail(
       email,

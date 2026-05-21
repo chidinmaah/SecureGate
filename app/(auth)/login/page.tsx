@@ -8,6 +8,7 @@ import { Input, Button, Alert } from "@/components/ui";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ShieldCheck } from "lucide-react";
 import { z } from "zod";
 
 type LoginValues = z.infer<typeof LoginSchema>;
@@ -15,7 +16,9 @@ type LoginValues = z.infer<typeof LoginSchema>;
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    searchParams.get("error") === "unverified" ? "Please verify your email before signing in." : null
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -56,6 +59,10 @@ function LoginForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg px-6 py-12">
       <div className="auth-card space-y-8">
+        <Link href="/" className="flex items-center justify-center gap-2">
+          <ShieldCheck className="w-6 h-6 text-primary" />
+          <span className="font-bold text-lg text-primary">SecureGate</span>
+        </Link>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-text">Welcome back</h1>
           <p className="text-sm text-muted">Sign in to your account to continue.</p>
@@ -64,6 +71,9 @@ function LoginForm() {
         {error && <Alert type="error">{error}</Alert>}
         {searchParams.get("verified") && (
           <Alert type="success">Email verified successfully. You can now sign in.</Alert>
+        )}
+        {searchParams.get("reset") === "success" && (
+          <Alert type="success">Password reset successfully. You can now sign in.</Alert>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

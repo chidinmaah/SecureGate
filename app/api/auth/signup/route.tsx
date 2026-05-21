@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     
     if (!success) {
       return NextResponse.json(
-        { error: "Too many attempts. Please try again in 15 minutes" },
+        { error: "Too many attempts. Please try again in 10 minutes" },
         { status: 429 }
       );
     }
@@ -42,13 +42,13 @@ export async function POST(req: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "An account with this email already exists" },
+        { error: "If this email is available, a verification link has been sent." },
         { status: 400 }
       );
     }
 
     // 4. Hash Password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // 5. Create User & Token
     const verificationToken = generateToken();
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     });
 
     // 6. Send Email (non-blocking)
-    const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${verificationToken}`;
+    const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-email/${verificationToken}`;
     
     sendEmail(
       email,

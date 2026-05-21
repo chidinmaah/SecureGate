@@ -61,9 +61,15 @@ export const authOptions: NextAuthOptions = {
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
+      if (token.emailVerified && session.user) {
+        session.user.emailVerified = token.emailVerified as Date;
+      }
       return session;
     },
-    async jwt({ token }) {
+    async jwt({ token, user }) {
+      if (user) {
+        token.emailVerified = user.emailVerified;
+      }
       return token;
     },
   },

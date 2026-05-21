@@ -3,16 +3,18 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    // If we're here, the user is authenticated. 
-    // We could add more checks here if needed.
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token }) => {
+        if (!token) return false;
+        if (!token.emailVerified) return false;
+        return true;
+      },
     },
     pages: {
-      signIn: "/login",
+      signIn: "/login?error=unverified",
     },
   }
 );

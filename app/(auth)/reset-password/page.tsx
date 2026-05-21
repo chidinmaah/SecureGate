@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ResetPasswordSchema } from "@/lib/validations";
 import { Input, Button, Alert } from "@/components/ui";
 import { useRouter, useSearchParams } from "next/navigation";
+import { PasswordStrength } from "@/components/PasswordStrength";
 import { z } from "zod";
 
 type ResetPasswordValues = z.infer<typeof ResetPasswordSchema>;
@@ -20,10 +21,13 @@ function ResetPasswordForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ResetPasswordValues>({
     resolver: zodResolver(ResetPasswordSchema),
   });
+
+  const password = watch("password");
 
   const onSubmit = async (data: ResetPasswordValues) => {
     if (!token) {
@@ -83,6 +87,7 @@ function ResetPasswordForm() {
             {...register("password")}
             error={errors.password?.message}
           />
+          <PasswordStrength password={password || ""} />
           <Input
             label="Confirm New Password"
             type="password"

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ForgotPasswordSchema } from "@/lib/validations";
 import { Input, Button, Alert } from "@/components/ui";
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { z } from "zod";
 
 type ForgotPasswordValues = z.infer<typeof ForgotPasswordSchema>;
@@ -45,6 +46,10 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg px-6 py-12">
       <div className="auth-card space-y-8">
+        <Link href="/" className="flex items-center justify-center gap-2">
+          <ShieldCheck className="w-6 h-6 text-primary" />
+          <span className="font-bold text-lg text-primary">SecureGate</span>
+        </Link>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-text">Forgot password?</h1>
           <p className="text-sm text-muted">No worries, we&apos;ll send you reset instructions.</p>

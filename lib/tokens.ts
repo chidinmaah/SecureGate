@@ -6,7 +6,7 @@ export function generateToken() {
 
 export function getVerificationExpiry() {
   const expiry = new Date();
-  expiry.setHours(expiry.getHours() + 24); // 24 hours
+  expiry.setMinutes(expiry.getMinutes() + 15); // 15 minutes
   return expiry;
 }
 

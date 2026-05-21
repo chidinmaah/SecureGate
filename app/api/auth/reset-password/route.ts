@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     }
 
     // 3. Update Password & Delete Token
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     await db.$transaction(async (tx) => {
       await tx.user.update({

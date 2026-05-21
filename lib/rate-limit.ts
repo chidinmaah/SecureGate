@@ -13,7 +13,7 @@ const redis = hasRedis
 const ratelimit = redis 
   ? new Ratelimit({
       redis: redis,
-      limiter: Ratelimit.slidingWindow(5, "15 m"),
+      limiter: Ratelimit.slidingWindow(5, "10 m"),
       analytics: true,
       prefix: "@upstash/ratelimit",
     })
