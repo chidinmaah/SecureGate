@@ -66,7 +66,8 @@ export async function POST(request: Request) {
       });
     });
 
-    const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-email/${verificationToken}`;
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const verifyUrl = `${baseUrl}/verify-email/${verificationToken}`;
 
     try {
       await sendEmail(

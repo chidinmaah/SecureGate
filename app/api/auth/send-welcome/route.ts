@@ -10,7 +10,7 @@ export async function POST() {
       WelcomeEmail({
         name: "Chidinma Okereke",
         email: "chidinmaah@gmail.com",
-        loginUrl: `${process.env.NEXTAUTH_URL}/login`,
+        loginUrl: `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/login`,
       })
     );
 

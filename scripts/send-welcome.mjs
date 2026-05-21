@@ -1,7 +1,10 @@
+import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import { render } from "@react-email/render";
 import { WelcomeEmail } from "../emails/WelcomeEmail.tsx";
 import React from "react";
+
+dotenv.config({ path: "../.env.local" });
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
@@ -11,14 +14,14 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  tls: { rejectUnauthorized: false },
+  tls: { rejectUnauthorized: process.env.SMTP_REJECT_UNAUTHORIZED === "false" ? false : true },
 });
 
 const html = await render(
   React.createElement(WelcomeEmail, {
     name: "Chidinma Okereke",
     email: "chidinmaah@gmail.com",
-    loginUrl: "http://localhost:3000/login",
+    loginUrl: `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/login`,
   })
 );
 
@@ -30,7 +33,3 @@ await transporter.sendMail({
 });
 
 console.log("Welcome email sent to chidinmaah@gmail.com");
-
-// Include dotenv to load .env.local
-import dotenv from "dotenv";
-dotenv.config({ path: "../.env.local" });
