@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui";
-import { LogOut, User, ShieldCheck, Smartphone, Globe, Monitor, Trash2, CheckCircle2, XCircle } from "lucide-react";
+import { LogOut, User, ShieldCheck, Smartphone, Globe, Monitor, Trash2, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type UserSession = {
@@ -29,17 +29,25 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<UserSession[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [revokeError, setRevokeError] = useState<string | null>(null);
   const [revoking, setRevoking] = useState<string | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
 
   async function loadSessions() {
     setLoading(true);
+    setFetchError(null);
     try {
       const res = await fetch("/api/auth/sessions");
       if (res.ok) {
         const data = await res.json();
         setSessions(data.sessions);
         setCurrentId(data.currentSessionId);
+      } else {
+        setFetchError("Failed to load sessions. Please refresh.");
       }
+    } catch {
+      setFetchError("Network error. Please refresh.");
     } finally {
       setLoading(false);
     }
@@ -51,6 +59,7 @@ export default function DashboardPage() {
 
   async function revokeSession(id: string) {
     setRevoking(id);
+    setRevokeError(null);
     try {
       const res = await fetch(`/api/auth/sessions/${id}`, { method: "DELETE" });
       if (res.ok) {
@@ -59,11 +68,21 @@ export default function DashboardPage() {
         );
       } else {
         const data = await res.json();
-        alert(data.error ?? "Failed to revoke session");
+        setRevokeError(data.error ?? "Failed to revoke session");
       }
+    } catch {
+      setRevokeError("Network error. Please try again.");
     } finally {
       setRevoking(null);
     }
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg">
+        <p className="text-muted">Loading...</p>
+      </div>
+    );
   }
 
   return (
@@ -81,8 +100,9 @@ export default function DashboardPage() {
               <span className="text-xs font-medium text-text">{session?.user?.email}</span>
             </div>
             <button 
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="p-2 text-muted hover:text-error transition-colors"
+              onClick={() => { setSigningOut(true); signOut({ callbackUrl: "/login" }); }}
+              disabled={signingOut}
+              className="p-2 text-muted hover:text-error transition-colors disabled:opacity-50"
               title="Logout"
             >
               <LogOut className="w-5 h-5" />
@@ -128,11 +148,29 @@ export default function DashboardPage() {
               <p className="text-sm text-muted mt-1">Manage devices and browsers signed into your account.</p>
             </div>
 
+            {fetchError && (
+              <div className="p-6">
+                <div className="flex items-center gap-2 text-sm text-error bg-error-bg border border-error/20 rounded-lg px-4 py-3">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                  <span>{fetchError}</span>
+                </div>
+              </div>
+            )}
+
+            {revokeError && (
+              <div className="px-6 pb-2">
+                <div className="flex items-center gap-2 text-sm text-error bg-error-bg border border-error/20 rounded-lg px-4 py-3">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                  <span>{revokeError}</span>
+                </div>
+              </div>
+            )}
+
             {loading ? (
               <div className="p-6 text-center text-sm text-muted">Loading sessions...</div>
-            ) : sessions.length === 0 ? (
+            ) : !fetchError && sessions.length === 0 ? (
               <div className="p-6 text-center text-sm text-muted">No sessions found.</div>
-            ) : (
+            ) : !fetchError ? (
               <div className="divide-y divide-border">
                 {sessions.map((s) => {
                   const info = parseDeviceInfo(s.userAgent);
@@ -195,7 +233,7 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </main>

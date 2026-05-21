@@ -15,6 +15,8 @@ declare module "next-auth" {
 
   interface User {
     emailVerified?: Date | null;
+    userAgent?: string;
+    ipAddress?: string;
   }
 }
 

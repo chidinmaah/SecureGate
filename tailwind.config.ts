@@ -31,11 +31,6 @@ const config: Config = {
           bg: "#FFFBEB",
         },
       },
-      scale: {
-        'display-large': '57px',
-        // I will map the typography tokens here if needed, 
-        // but I can also use standard tailwind classes or custom ones.
-      },
     },
   },
   plugins: [],

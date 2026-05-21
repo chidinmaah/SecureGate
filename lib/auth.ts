@@ -1,15 +1,17 @@
 import { NextAuthOptions } from "next-auth";
+import { Adapter } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import db from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { LoginSchema } from "@/lib/validations";
+import { createSession, validateSession, touchSession } from "@/lib/session";
 
 export const authOptions: NextAuthOptions = {
-  // @ts-ignore - PrismaAdapter type conflict with newer peer deps sometimes happens
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(db) as unknown as Adapter,
   session: {
     strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60,
   },
   pages: {
     signIn: "/login",
@@ -24,7 +26,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         const validatedFields = LoginSchema.safeParse(credentials);
-        
+
         if (!validatedFields.success) {
           return null;
         }
@@ -52,6 +54,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
+          emailVerified: user.emailVerified,
           userAgent: req?.headers?.["user-agent"] ?? "Unknown",
           ipAddress: req?.headers?.["x-forwarded-for"] ?? "Unknown",
         };
@@ -64,39 +67,27 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub;
       }
       if (token.emailVerified && session.user) {
-        session.user.emailVerified = token.emailVerified as Date;
+        session.user.emailVerified = token.emailVerified;
       }
-      (session as any).sessionId = token.sessionId;
+      session.sessionId = token.sessionId;
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.emailVerified = user.emailVerified;
-        // Create a session record on new sign-in
-        const session = await db.userSession.create({
-          data: {
-            userId: user.id,
-            userAgent: (user as any).userAgent ?? "Unknown",
-            ipAddress: (user as any).ipAddress ?? "Unknown",
-          },
-        });
-        token.sessionId = session.id;
+        token.sessionId = await createSession(
+          user.id,
+          user.userAgent ?? "Unknown",
+          user.ipAddress ?? "Unknown"
+        );
       }
 
-      // On every token refresh, check if session is still valid
       if (token.sessionId) {
-        const session = await db.userSession.findUnique({
-          where: { id: token.sessionId as string },
-        });
-        if (!session || session.isRevoked) {
-          // If the session was revoked, force sign-out
-          return {} as any;
+        const valid = await validateSession(token.sessionId);
+        if (!valid) {
+          return {};
         }
-        // Touch lastActiveAt (fire-and-forget)
-        db.userSession.update({
-          where: { id: session.id },
-          data: { lastActiveAt: new Date() },
-        }).catch(() => {});
+        touchSession(token.sessionId);
       }
 
       return token;

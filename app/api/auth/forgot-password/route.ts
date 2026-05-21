@@ -4,18 +4,18 @@ import { ForgotPasswordSchema } from "@/lib/validations";
 import { generateToken, getResetPasswordExpiry } from "@/lib/tokens";
 import { sendEmail } from "@/lib/mailer";
 import { ResetPasswordEmail } from "@/emails/ResetPasswordEmail";
-import { authRateLimit } from "@/lib/rate-limit";
+import { forgotPasswordLimiter } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import * as React from "react";
 
 export async function POST(req: Request) {
   try {
     const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
-    const { success } = await authRateLimit.limit(ip);
-    
+    const { success } = await forgotPasswordLimiter.limit(ip);
+
     if (!success) {
       return NextResponse.json(
-        { error: "Too many attempts. Please try again in 10 minutes" },
+        { error: "Too many attempts. Please try again in 5 minutes" },
         { status: 429 }
       );
     }
@@ -54,14 +54,20 @@ export async function POST(req: Request) {
     });
 
     const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password/${resetToken}`;
-    
-    sendEmail(
-      email,
-      "Reset your password",
-      React.createElement(ResetPasswordEmail, { resetUrl })
-    ).catch((err) => {
-      console.error("[EMAIL] Failed to send password reset email:", err);
-    });
+
+    try {
+      await sendEmail(
+        email,
+        "Reset your password",
+        React.createElement(ResetPasswordEmail, { resetUrl })
+      );
+    } catch (emailErr) {
+      console.error("[EMAIL] Failed to send password reset email:", emailErr);
+      return NextResponse.json(
+        { error: "Failed to send reset email. Please try again later." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(response, { status: 200 });
 

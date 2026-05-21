@@ -17,14 +17,6 @@
   --color-error-bg: #FEF2F2;
   --color-warning: #D97706;
   --color-warning-bg: #FFFBEB;
-
-  /* Typography Scale (Material 3 derived) */
-  --display-large: 57px;
-  --display-medium: 45px;
-  --display-small: 36px;
-  --headline-large: 32px;
-  --headline-medium: 28px;
-  --headline-small: 24px;
 }
 
 body {

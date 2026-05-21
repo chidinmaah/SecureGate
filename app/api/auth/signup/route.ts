@@ -5,15 +5,15 @@ import { SignUpSchema } from "@/lib/validations";
 import { generateToken, getVerificationExpiry } from "@/lib/tokens";
 import { sendEmail } from "@/lib/mailer";
 import { VerificationEmail } from "@/emails/VerificationEmail";
-import { authRateLimit } from "@/lib/rate-limit";
+import { signupLimiter } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import * as React from "react";
 
 export async function POST(req: Request) {
   try {
     const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
-    const { success } = await authRateLimit.limit(ip);
-    
+    const { success } = await signupLimiter.limit(ip);
+
     if (!success) {
       return NextResponse.json(
         { error: "Too many attempts. Please try again in 10 minutes" },
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     if (!validatedFields.success) {
       return NextResponse.json(
-        { error: "Invalid fields", details: validatedFields.error.flatten().fieldErrors },
+        { error: "Invalid fields" },
         { status: 400 }
       );
     }
@@ -68,14 +68,20 @@ export async function POST(req: Request) {
     });
 
     const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-email/${verificationToken}`;
-    
-    sendEmail(
-      email,
-      "Verify your account",
-      React.createElement(VerificationEmail, { name, verifyUrl })
-    ).catch((err) => {
-      console.error("[EMAIL] Failed to send verification email:", err);
-    });
+
+    try {
+      await sendEmail(
+        email,
+        "Verify your account",
+        React.createElement(VerificationEmail, { name, verifyUrl })
+      );
+    } catch (emailErr) {
+      console.error("[EMAIL] Failed to send verification email:", emailErr);
+      return NextResponse.json(
+        { error: "Account created but failed to send verification email. Please use resend later." },
+        { status: 201 }
+      );
+    }
 
     return NextResponse.json(
       { message: "Check your email to verify your account" },

@@ -12,7 +12,8 @@ import { z } from "zod";
 type ForgotPasswordValues = z.infer<typeof ForgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
-  const [message, setMessage] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -25,7 +26,8 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data: ForgotPasswordValues) => {
     setIsLoading(true);
-    setMessage(null);
+    setError(null);
+    setSuccess(null);
 
     try {
       const res = await fetch("/api/auth/forgot-password", {
@@ -35,9 +37,13 @@ export default function ForgotPasswordPage() {
       });
 
       const result = await res.json();
-      setMessage(result.message || result.error);
-    } catch (err) {
-      setMessage("Something went wrong. Please try again.");
+      if (!res.ok) {
+        setError(result.error || "Something went wrong");
+      } else {
+        setSuccess(result.message);
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -55,9 +61,10 @@ export default function ForgotPasswordPage() {
           <p className="text-sm text-muted">No worries, we&apos;ll send you reset instructions.</p>
         </div>
 
-        {message && <Alert type="warning">{message}</Alert>}
+        {success && <Alert type="success">{success}</Alert>}
+        {error && <Alert type="error">{error}</Alert>}
 
-        {!message && (
+        {!success && (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input
               label="Email Address"

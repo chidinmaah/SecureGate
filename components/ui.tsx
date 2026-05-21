@@ -1,9 +1,7 @@
 import React from "react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+function joinClasses(...classes: (string | false | null | undefined)[]) {
+  return classes.filter(Boolean).join(" ");
 }
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -20,7 +18,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </label>
         <input
           ref={ref}
-          className={cn(
+          className={joinClasses(
             "input-field",
             error && "border-error focus:border-error focus:ring-error/20",
             className
@@ -49,7 +47,7 @@ export const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      className={cn("btn-primary", className)}
+      className={joinClasses("btn-primary", className)}
       disabled={isLoading || props.disabled}
       {...props}
     >
@@ -71,7 +69,7 @@ export const Alert = ({ type, children }: AlertProps) => {
   };
 
   return (
-    <div className={cn(
+    <div className={joinClasses(
       "border-l-4 p-4 text-sm font-medium rounded-r-md",
       styles[type]
     )}>

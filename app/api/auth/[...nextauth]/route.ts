@@ -1,15 +1,15 @@
 import { authOptions } from "@/lib/auth";
 import NextAuth from "next-auth";
-import { NextResponse } from "next/server";
-import { authRateLimit } from "@/lib/rate-limit";
+import { NextRequest, NextResponse } from "next/server";
+import { loginLimiter } from "@/lib/rate-limit";
 
-const handler = NextAuth(authOptions);
+const { GET, POST: nextAuthPOST } = NextAuth(authOptions);
 
-export { handler as GET };
+export { GET };
 
-export async function POST(req: Request) {
-  const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
-  const { success } = await authRateLimit.limit(ip);
+export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  const { success } = await loginLimiter.limit(ip);
 
   if (!success) {
     return NextResponse.json(
@@ -18,5 +18,5 @@ export async function POST(req: Request) {
     );
   }
 
-  return handler(req as any);
+  return nextAuthPOST(request);
 }

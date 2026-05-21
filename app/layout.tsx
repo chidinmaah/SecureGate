@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import "./globals.css";
-
-import { Providers } from "@/components/Providers";
+import { SessionProvider } from "next-auth/react";
 
 const interTight = Inter_Tight({ 
   subsets: ["latin"],
@@ -23,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={interTight.className}>
-        <Providers>{children}</Providers>
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );
