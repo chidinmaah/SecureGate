@@ -26,7 +26,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Delete old tokens for this user
     await db.verificationToken.deleteMany({
       where: { identifier: email },
     });
@@ -43,14 +42,17 @@ export async function POST(req: Request) {
     sendEmail(
       email,
       "Verify your account",
-      <VerificationEmail name={user.name} verifyUrl={verifyUrl} />
-    ).catch(() => {});
+      React.createElement(VerificationEmail, { name: user.name, verifyUrl })
+    ).catch((err) => {
+      console.error("[EMAIL] Failed to resend verification email:", err);
+    });
 
     return NextResponse.json(
       { message: "If this email exists, a verification link has been sent." },
       { status: 200 }
     );
-  } catch {
+  } catch (error) {
+    console.error("[RESEND-VERIFICATION] Error:", error);
     return NextResponse.json(
       { message: "If this email exists, a verification link has been sent." },
       { status: 200 }

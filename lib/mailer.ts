@@ -22,11 +22,10 @@ export const sendEmail = async (
 ) => {
   const html = await render(component);
 
-  const info = await transporter.sendMail({
+  await transporter.sendMail({
     from: process.env.SMTP_FROM || `"SecureGate" <${process.env.SMTP_USER}>`,
     to,
     subject,
     html,
   });
-
 };

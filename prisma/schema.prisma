@@ -15,6 +15,7 @@ model User {
   password      String
   emailVerified DateTime?
   createdAt     DateTime  @default(now())
+  sessions      UserSession[]
 }
 
 model VerificationToken {
@@ -31,4 +32,18 @@ model PasswordResetToken {
   expires DateTime
 
   @@id([email, token])
+}
+
+model UserSession {
+  id          String    @id @default(cuid())
+  userId      String
+  userAgent   String
+  ipAddress   String
+  isRevoked   Boolean   @default(false)
+  lastActiveAt DateTime @default(now())
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

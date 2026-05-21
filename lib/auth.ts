@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         const validatedFields = LoginSchema.safeParse(credentials);
         
         if (!validatedFields.success) {
@@ -52,6 +52,8 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
+          userAgent: req?.headers?.["user-agent"] ?? "Unknown",
+          ipAddress: req?.headers?.["x-forwarded-for"] ?? "Unknown",
         };
       },
     }),
@@ -64,12 +66,39 @@ export const authOptions: NextAuthOptions = {
       if (token.emailVerified && session.user) {
         session.user.emailVerified = token.emailVerified as Date;
       }
+      (session as any).sessionId = token.sessionId;
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.emailVerified = user.emailVerified;
+        // Create a session record on new sign-in
+        const session = await db.userSession.create({
+          data: {
+            userId: user.id,
+            userAgent: (user as any).userAgent ?? "Unknown",
+            ipAddress: (user as any).ipAddress ?? "Unknown",
+          },
+        });
+        token.sessionId = session.id;
       }
+
+      // On every token refresh, check if session is still valid
+      if (token.sessionId) {
+        const session = await db.userSession.findUnique({
+          where: { id: token.sessionId as string },
+        });
+        if (!session || session.isRevoked) {
+          // If the session was revoked, force sign-out
+          return {} as any;
+        }
+        // Touch lastActiveAt (fire-and-forget)
+        db.userSession.update({
+          where: { id: session.id },
+          data: { lastActiveAt: new Date() },
+        }).catch(() => {});
+      }
+
       return token;
     },
   },

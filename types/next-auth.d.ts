@@ -10,6 +10,7 @@ declare module "next-auth" {
       image?: string | null;
       emailVerified?: Date | null;
     };
+    sessionId?: string;
   }
 
   interface User {
@@ -20,5 +21,6 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     emailVerified?: Date | null;
+    sessionId?: string;
   }
 }

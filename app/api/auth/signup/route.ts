@@ -11,7 +11,6 @@ import * as React from "react";
 
 export async function POST(req: Request) {
   try {
-    // 1. Rate Limiting
     const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
     const { success } = await authRateLimit.limit(ip);
     
@@ -22,7 +21,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Validation
     const body = await req.json();
     const validatedFields = SignUpSchema.safeParse(body);
 
@@ -35,7 +33,6 @@ export async function POST(req: Request) {
 
     const { email, password, name } = validatedFields.data;
 
-    // 3. Check if user exists
     const existingUser = await db.user.findUnique({
       where: { email },
     });
@@ -47,10 +44,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4. Hash Password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // 5. Create User & Token
     const verificationToken = generateToken();
     const expires = getVerificationExpiry();
 
@@ -72,15 +67,14 @@ export async function POST(req: Request) {
       });
     });
 
-    // 6. Send Email (non-blocking)
     const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-email/${verificationToken}`;
     
     sendEmail(
       email,
       "Verify your account",
-      <VerificationEmail name={name} verifyUrl={verifyUrl} />
-    ).catch(() => {
-      // Email failure doesn't block signup
+      React.createElement(VerificationEmail, { name, verifyUrl })
+    ).catch((err) => {
+      console.error("[EMAIL] Failed to send verification email:", err);
     });
 
     return NextResponse.json(
@@ -89,6 +83,7 @@ export async function POST(req: Request) {
     );
 
   } catch (error) {
+    console.error("[SIGNUP] Error:", error);
     return NextResponse.json(
       { error: "Something went wrong. Please try again later" },
       { status: 500 }

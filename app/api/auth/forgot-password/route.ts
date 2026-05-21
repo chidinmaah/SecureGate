@@ -10,7 +10,6 @@ import * as React from "react";
 
 export async function POST(req: Request) {
   try {
-    // 1. Rate Limiting
     const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
     const { success } = await authRateLimit.limit(ip);
     
@@ -21,7 +20,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Validation
     const body = await req.json();
     const validatedFields = ForgotPasswordSchema.safeParse(body);
 
@@ -34,10 +32,8 @@ export async function POST(req: Request) {
 
     const { email } = validatedFields.data;
 
-    // 3. Always return success message
     const response = { message: "If this email exists, a reset link has been sent" };
 
-    // 4. Check user
     const user = await db.user.findUnique({
       where: { email },
     });
@@ -46,7 +42,6 @@ export async function POST(req: Request) {
       return NextResponse.json(response, { status: 200 });
     }
 
-    // 5. Generate and save token
     const resetToken = generateToken();
     const expires = getResetPasswordExpiry();
 
@@ -58,20 +53,20 @@ export async function POST(req: Request) {
       },
     });
 
-    // 6. Send Email (non-blocking)
     const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password/${resetToken}`;
     
     sendEmail(
       email,
       "Reset your password",
-      <ResetPasswordEmail resetUrl={resetUrl} />
-    ).catch(() => {
-      // Email failure doesn't block the response
+      React.createElement(ResetPasswordEmail, { resetUrl })
+    ).catch((err) => {
+      console.error("[EMAIL] Failed to send password reset email:", err);
     });
 
     return NextResponse.json(response, { status: 200 });
 
   } catch (error) {
+    console.error("[FORGOT-PASSWORD] Error:", error);
     return NextResponse.json(
       { error: "Something went wrong. Please try again later" },
       { status: 500 }
