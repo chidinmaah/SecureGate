@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { z } from "zod";
 import { resetPasswordLimiter } from "@/lib/rate-limit";
 import { PasswordSchema } from "@/lib/validations";
+import { getClientIp } from "@/lib/client-ip";
 
 const RequestSchema = z.object({
   token: z.string().min(1, "Missing token"),
@@ -12,7 +13,7 @@ const RequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = getClientIp(request);
     const { success } = await resetPasswordLimiter.limit(ip);
 
     if (!success) {

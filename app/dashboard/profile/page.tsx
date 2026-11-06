@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { Input, Button, Alert } from "@/components/ui";
 import { User, Lock } from "lucide-react";
+import { PasswordStrength } from "@/components/PasswordStrength";
 
 export default function ProfilePage() {
   const { data: session, update } = useSession();
@@ -108,7 +109,8 @@ export default function ProfilePage() {
             <input
               className="input-field bg-bg text-muted cursor-not-allowed"
               value={session?.user?.email ?? ""}
-              disabled
+              readOnly
+              aria-disabled="true"
             />
             <p className="text-xs text-muted">Email cannot be changed.</p>
           </div>
@@ -148,6 +150,7 @@ export default function ProfilePage() {
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder="Enter new password"
           />
+          <PasswordStrength password={newPassword} />
           <Input
             label="Confirm New Password"
             type="password"

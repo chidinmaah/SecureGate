@@ -85,6 +85,7 @@ export default function DashboardLayout({
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="p-1.5 text-muted hover:text-error transition-colors"
+              aria-label="Sign out"
             >
               <LogOut className="w-4 h-4" />
             </button>

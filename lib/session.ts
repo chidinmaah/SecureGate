@@ -24,3 +24,14 @@ export async function touchSession(sessionId: string) {
     // Silently skip — session touch is best-effort
   }
 }
+
+export async function revokeSession(sessionId: string) {
+  try {
+    await db.userSession.update({
+      where: { id: sessionId },
+      data: { isRevoked: true },
+    });
+  } catch {
+    // Silently skip — session may already be revoked
+  }
+}

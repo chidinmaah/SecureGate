@@ -5,7 +5,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import db from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { LoginSchema } from "@/lib/validations";
-import { createSession, validateSession, touchSession } from "@/lib/session";
+import { createSession, validateSession, touchSession, revokeSession } from "@/lib/session";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db) as unknown as Adapter,
@@ -55,6 +55,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           emailVerified: user.emailVerified,
+          createdAt: user.createdAt,
           userAgent: req?.headers?.["user-agent"] ?? "Unknown",
           ipAddress: req?.headers?.["x-forwarded-for"] ?? "Unknown",
         };
@@ -69,12 +70,16 @@ export const authOptions: NextAuthOptions = {
       if (token.emailVerified && session.user) {
         session.user.emailVerified = token.emailVerified;
       }
+      if (token.createdAt && session.user) {
+        session.user.createdAt = token.createdAt;
+      }
       session.sessionId = token.sessionId;
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.emailVerified = user.emailVerified;
+        token.createdAt = user.createdAt;
         token.sessionId = await createSession(
           user.id,
           user.userAgent ?? "Unknown",
@@ -91,6 +96,13 @@ export const authOptions: NextAuthOptions = {
       }
 
       return token;
+    },
+  },
+  events: {
+    async signOut({ token }) {
+      if (token?.sessionId) {
+        await revokeSession(token.sessionId);
+      }
     },
   },
 };
