@@ -1,5 +1,3 @@
-declare module "lucide-react";
-
 import "next-auth";
 import "next-auth/jwt";
 
@@ -11,6 +9,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       emailVerified?: Date | null;
+      createdAt?: Date | null;
     };
     sessionId?: string;
   }
@@ -19,6 +18,7 @@ declare module "next-auth" {
     emailVerified?: Date | null;
     userAgent?: string;
     ipAddress?: string;
+    createdAt?: Date | null;
   }
 }
 
@@ -26,5 +26,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     emailVerified?: Date | null;
     sessionId?: string;
+    createdAt?: Date | null;
   }
 }

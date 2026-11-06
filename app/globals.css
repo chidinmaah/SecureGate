@@ -5,11 +5,11 @@
 :root {
   --color-primary: #1E3A5F;
   --color-primary-hover: #16304F;
-  --color-accent: #2E75B6;
+  --color-accent: #1D5A8F;
   --color-bg: #F9FAFB;
   --color-surface: #FFFFFF;
   --color-border: #E5E7EB;
-  --color-muted: #6B7280;
+  --color-muted: #4B5563;
   --color-text: #111827;
   --color-success: #16A34A;
   --color-success-bg: #F0FDF4;
@@ -31,7 +31,7 @@ body {
   }
   
   .btn-primary {
-    @apply bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2;
   }
 
   .input-field {

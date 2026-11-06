@@ -6,11 +6,12 @@ import { generateToken, getVerificationExpiry } from "@/lib/tokens";
 import { sendEmail } from "@/lib/mailer";
 import { VerificationEmail } from "@/emails/VerificationEmail";
 import { signupLimiter } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/client-ip";
 import * as React from "react";
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = getClientIp(request);
     const { success } = await signupLimiter.limit(ip);
 
     if (!success) {
@@ -37,9 +38,12 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
+      // Perform a dummy hash to equalize response timing and avoid leaking
+      // whether the account exists via status code or latency.
+      await bcrypt.hash(password, 12);
       return NextResponse.json(
-        { error: "If this email is available, a verification link has been sent." },
-        { status: 400 }
+        { message: "If this email is available, a verification link has been sent." },
+        { status: 200 }
       );
     }
 
@@ -84,8 +88,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { message: "Check your email to verify your account" },
-      { status: 201 }
+      { message: "If this email is available, a verification link has been sent." },
+      { status: 200 }
     );
 
   } catch (error) {

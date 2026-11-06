@@ -5,11 +5,12 @@ import { generateToken, getResetPasswordExpiry } from "@/lib/tokens";
 import { sendEmail } from "@/lib/mailer";
 import { ResetPasswordEmail } from "@/emails/ResetPasswordEmail";
 import { forgotPasswordLimiter } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/client-ip";
 import * as React from "react";
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = getClientIp(request);
     const { success } = await forgotPasswordLimiter.limit(ip);
 
     if (!success) {

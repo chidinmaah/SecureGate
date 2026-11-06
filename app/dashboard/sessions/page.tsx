@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Monitor, Smartphone, Globe, Trash2, CheckCircle2, XCircle, AlertTriangle, RefreshCw } from "lucide-react";
+import { Monitor, Smartphone, Globe, Trash2, CheckCircle2, XCircle, AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
 
 type UserSession = {
   id: string;
@@ -48,6 +48,7 @@ export default function SessionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [revoking, setRevoking] = useState<string | null>(null);
+  const [revokeError, setRevokeError] = useState<string | null>(null);
 
   async function loadSessions() {
     setLoading(true);
@@ -74,6 +75,7 @@ export default function SessionsPage() {
 
   async function revokeSession(id: string) {
     setRevoking(id);
+    setRevokeError(null);
     try {
       const res = await fetch(`/api/auth/sessions/${id}`, { method: "DELETE" });
       if (res.ok) {
@@ -82,10 +84,10 @@ export default function SessionsPage() {
         );
       } else {
         const data = await res.json();
-        alert(data.error ?? "Failed to revoke session");
+        setRevokeError(data.error ?? "Failed to revoke session");
       }
     } catch {
-      alert("Network error");
+      setRevokeError("Network error");
     } finally {
       setRevoking(null);
     }
@@ -105,7 +107,7 @@ export default function SessionsPage() {
         <button
           onClick={loadSessions}
           className="p-2 text-muted hover:text-text transition-colors"
-          title="Refresh"
+          aria-label="Refresh sessions"
         >
           <RefreshCw className="w-5 h-5" />
         </button>
@@ -118,8 +120,16 @@ export default function SessionsPage() {
         </div>
       )}
 
+      {revokeError && (
+        <div className="flex items-center gap-2 text-sm text-error bg-error-bg border border-error/20 rounded-lg px-4 py-3">
+          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+          <span>{revokeError}</span>
+        </div>
+      )}
+
       {loading ? (
-        <div className="bg-surface border border-border rounded-xl p-12 text-center text-sm text-muted">
+        <div className="bg-surface border border-border rounded-xl p-12 flex items-center justify-center gap-2 text-sm text-muted">
+          <Loader2 className="w-4 h-4 animate-spin" />
           Loading sessions...
         </div>
       ) : sessions.length === 0 ? (
@@ -177,7 +187,7 @@ export default function SessionsPage() {
                       onClick={() => revokeSession(s.id)}
                       disabled={revoking === s.id}
                       className="p-2 text-muted hover:text-error transition-colors disabled:opacity-50"
-                      title="Revoke session"
+                      aria-label={`Revoke ${info.os} session`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

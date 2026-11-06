@@ -57,10 +57,20 @@ export async function PATCH(request: Request) {
 
   const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { password: hashedPassword },
-  });
+  await db.$transaction([
+    db.user.update({
+      where: { id: session.user.id },
+      data: { password: hashedPassword },
+    }),
+    db.userSession.updateMany({
+      where: {
+        userId: session.user.id,
+        isRevoked: false,
+        id: { not: session.sessionId ?? "" },
+      },
+      data: { isRevoked: true },
+    }),
+  ]);
 
   return NextResponse.json({ success: true });
 }

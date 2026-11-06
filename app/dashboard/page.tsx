@@ -27,8 +27,8 @@ export default function DashboardOverview() {
   }, []);
 
   const activeSessions = sessions.filter((s) => !s.isRevoked);
-  const memberSince = session?.user?.id
-    ? new Date(parseInt(session.user.id.substring(0, 8), 16) * 1000)
+  const memberSince = session?.user?.createdAt
+    ? new Date(session.user.createdAt)
     : null;
 
   const stats = [
