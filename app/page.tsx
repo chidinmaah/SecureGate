@@ -15,7 +15,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 const navLinks = [
-  { href: "#trust", label: "Trust" },
   { href: "#features", label: "Features" },
   { href: "#benefits", label: "Benefits" },
   { href: "#testimonials", label: "Testimonials" },
