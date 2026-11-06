@@ -37,4 +37,19 @@ body {
   .input-field {
     @apply w-full p-3 border border-border rounded-lg text-sm focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all;
   }
+
+  .glass {
+    @apply bg-white/60 backdrop-blur-xl border border-white/60;
+    box-shadow: 0 8px 32px rgba(7, 48, 66, 0.08);
+  }
+
+  .glass-dark {
+    @apply bg-white/[0.04] backdrop-blur-xl border border-white/10;
+    box-shadow: 0 8px 32px rgba(2, 13, 18, 0.35);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(100deg, #ffffff 0%, #8fe6df 55%, #01a79e 100%);
+  }
 }
