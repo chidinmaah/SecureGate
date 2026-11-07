@@ -9,7 +9,6 @@ import {
   Users,
   Check,
   Star,
-  Menu,
   Fingerprint,
   ArrowRight,
   Smartphone,
@@ -20,12 +19,7 @@ import {
 } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-
-const navLinks = [
-  { href: "#features", label: "Features" },
-  { href: "#benefits", label: "Why SecureGate" },
-  { href: "#testimonials", label: "Customers" },
-];
+import Header from "@/components/Header";
 
 const trustStats = [
   { value: "99.9%", label: "Uptime SLA" },
@@ -113,72 +107,19 @@ export default async function Home() {
   const session = await getServerSession(authOptions);
 
   return (
-    <div className="min-h-screen bg-brand-ink text-white font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-brand-ink text-white antialiased overflow-x-hidden scroll-smooth">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-40 glass-dark">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand to-[#0fb5ad] flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-white" />
-            </span>
-            <span className="font-bold text-lg text-white tracking-tight">
-              SecureGate
-            </span>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-9">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-white/60 hover:text-white transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-
-          <div className="hidden md:flex items-center gap-3">
-            {session ? (
-              <Link
-                href="/dashboard"
-                className="bg-brand hover:bg-brand-hover text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
-              >
-                Dashboard
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-white/60 hover:text-white px-4 py-2 transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="bg-brand hover:bg-brand-hover text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
-                >
-                  Get Started
-                </Link>
-              </>
-            )}
-          </div>
-
-          <button className="md:hidden p-2 text-white" aria-label="Open menu">
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
-      </header>
+      <Header session={!!session} />
 
       {/* ── Hero ── */}
       <section className="relative px-6 pt-20 pb-16 md:pt-28 md:pb-24">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute -top-40 -left-32 w-[42rem] h-[42rem] rounded-full bg-[#01A79E]/20 blur-[120px]" />
-          <div className="absolute top-10 right-0 w-[34rem] h-[34rem] rounded-full bg-[#1279A6]/20 blur-[120px]" />
-          <div className="absolute bottom-0 left-1/3 w-[28rem] h-[28rem] rounded-full bg-[#26C165]/10 blur-[100px]" />
+          <div className="absolute -top-40 -left-32 w-[24rem] h-[24rem] md:w-[42rem] md:h-[42rem] rounded-full bg-[#01A79E]/20 blur-[120px]" />
+          <div className="absolute top-10 right-0 w-[20rem] h-[20rem] md:w-[34rem] md:h-[34rem] rounded-full bg-[#1279A6]/20 blur-[120px]" />
+          <div className="absolute bottom-0 left-1/3 w-[16rem] h-[16rem] md:w-[28rem] md:h-[28rem] rounded-full bg-[#26C165]/10 blur-[100px]" />
         </div>
 
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="space-y-7">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-dark text-sm font-medium text-brand-mint">
               <BadgeCheck className="w-4 h-4 text-brand" />
@@ -196,11 +137,11 @@ export default async function Home() {
               can ship with confidence in minutes, not weeks.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
               {session ? (
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold px-7 py-3.5 rounded-full transition-all shadow-lg shadow-brand/30"
+                  className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold px-7 py-3.5 rounded-full transition-all shadow-lg shadow-brand/30"
                 >
                   Go to Dashboard <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -208,13 +149,13 @@ export default async function Home() {
                 <>
                   <Link
                     href="/signup"
-                    className="inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold px-7 py-3.5 rounded-full transition-all shadow-lg shadow-brand/30"
+                    className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold px-7 py-3.5 rounded-full transition-all shadow-lg shadow-brand/30"
                   >
                     Get Started Free <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
                     href="/login"
-                    className="inline-flex items-center gap-2 text-white/70 hover:text-white font-medium px-6 py-3.5 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 text-white/70 hover:text-white font-medium px-6 py-3.5 transition-colors"
                   >
                     Sign In
                   </Link>
@@ -228,7 +169,7 @@ export default async function Home() {
                   <p className="text-2xl md:text-3xl font-bold text-white">
                     {stat.value}
                   </p>
-                  <p className="text-xs text-white/50">{stat.label}</p>
+                  <p className="text-xs text-white/60">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -237,7 +178,7 @@ export default async function Home() {
           {/* Phone mockup */}
           <div className="relative flex justify-center lg:justify-end">
             <div className="absolute -inset-8 bg-gradient-to-tr from-brand/20 to-[#1279A6]/20 blur-3xl rounded-full" />
-            <div className="relative w-[300px] rounded-[3rem] border border-white/15 bg-white/[0.05] backdrop-blur-2xl p-3 shadow-2xl">
+            <div className="relative w-[260px] sm:w-[300px] rounded-[3rem] border border-white/15 bg-white/[0.05] backdrop-blur-2xl p-3 shadow-2xl">
               <div className="rounded-[2.4rem] bg-brand-darker border border-white/10 overflow-hidden">
                 <div className="flex items-center justify-between px-5 pt-4">
                   <div className="flex items-center gap-2">
@@ -253,7 +194,7 @@ export default async function Home() {
 
                 <div className="px-5 py-6 space-y-4">
                   <div>
-                    <p className="text-[11px] text-white/40">Welcome back</p>
+                    <p className="text-xs text-white/60">Welcome back</p>
                     <p className="text-sm font-semibold text-white">
                       Good morning, Ada
                     </p>
@@ -268,7 +209,7 @@ export default async function Home() {
                         <p className="text-xs font-semibold text-white">
                           Biometric verified
                         </p>
-                        <p className="text-[10px] text-white/40">
+                        <p className="text-[11px] text-white/60">
                           Face ID · Just now
                         </p>
                       </div>
@@ -277,8 +218,8 @@ export default async function Home() {
                   </div>
 
                   <div className="space-y-2.5">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-white/50">Active sessions</span>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-white/70">Active sessions</span>
                       <span className="text-brand-mint font-medium">3 devices</span>
                     </div>
                     {[
@@ -291,10 +232,10 @@ export default async function Home() {
                       >
                         <s.icon className="w-4 h-4 text-white/50" />
                         <div className="flex-1">
-                          <p className="text-[11px] font-medium text-white">
+                          <p className="text-xs font-medium text-white">
                             {s.label}
                           </p>
-                          <p className="text-[10px] text-white/40">{s.place}</p>
+                          <p className="text-[11px] text-white/60">{s.place}</p>
                         </div>
                         <span className="w-1.5 h-1.5 rounded-full bg-brand-green" />
                       </div>
@@ -307,7 +248,7 @@ export default async function Home() {
                       <p className="text-xs font-semibold text-white">
                         Identity verified
                       </p>
-                      <p className="text-[10px] text-white/70">
+                      <p className="text-[11px] text-white/80">
                         KYC &amp; email confirmed
                       </p>
                     </div>
@@ -322,13 +263,13 @@ export default async function Home() {
 
       {/* ── Compliance strip ── */}
       <section className="px-6 py-10 border-y border-white/10 bg-white/[0.02]">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-12 gap-y-6">
           {compliance.map((item) => (
             <div key={item.label} className="flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 text-brand" />
               <div>
                 <p className="text-sm font-semibold text-white">{item.label}</p>
-                <p className="text-xs text-white/40">{item.detail}</p>
+                <p className="text-xs text-white/60">{item.detail}</p>
               </div>
             </div>
           ))}
@@ -336,14 +277,14 @@ export default async function Home() {
       </section>
 
       {/* ── Features ── */}
-      <section id="features" className="px-6 py-20 md:py-28">
+      <section id="features" className="px-6 py-20 md:py-28 scroll-mt-20">
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold text-brand mb-3">Features</p>
             <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
               Everything you need to ship auth
             </h2>
-            <p className="text-white/50 mt-3">
+            <p className="text-white/60 mt-3">
               Complete authentication features designed to be secure, fast, and
               easy to extend.
             </p>
@@ -363,7 +304,7 @@ export default async function Home() {
                   <h3 className="font-semibold text-lg text-white">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-white/50 leading-relaxed">
+                  <p className="text-sm text-white/60 leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -376,7 +317,7 @@ export default async function Home() {
       {/* ── Benefits ── */}
       <section
         id="benefits"
-        className="relative px-6 py-20 md:py-28 border-y border-white/10 bg-white/[0.02]"
+        className="relative px-6 py-20 md:py-28 border-y border-white/10 bg-white/[0.02] scroll-mt-20"
       >
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute top-1/4 right-0 w-[30rem] h-[30rem] rounded-full bg-brand/10 blur-[120px]" />
@@ -407,7 +348,7 @@ export default async function Home() {
               </div>
               <div>
                 <h3 className="font-semibold text-white">Zero-config security</h3>
-                <p className="text-sm text-white/40">Hardened by default</p>
+                <p className="text-sm text-white/60">Hardened by default</p>
               </div>
             </div>
             <div className="space-y-3">
@@ -431,14 +372,14 @@ export default async function Home() {
       </section>
 
       {/* ── Testimonials ── */}
-      <section id="testimonials" className="px-6 py-20 md:py-28">
+      <section id="testimonials" className="px-6 py-20 md:py-28 scroll-mt-20">
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold text-brand mb-3">Customers</p>
             <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
               Loved by developers
             </h2>
-            <p className="text-white/50 mt-3">
+            <p className="text-white/60 mt-3">
               See what teams building on SecureGate have to say.
             </p>
           </div>
@@ -463,7 +404,7 @@ export default async function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-white">{t.name}</p>
-                    <p className="text-xs text-white/40">{t.role}</p>
+                    <p className="text-xs text-white/60">{t.role}</p>
                   </div>
                 </figcaption>
               </figure>
@@ -528,7 +469,7 @@ export default async function Home() {
             <span className="font-bold text-white">SecureGate</span>
           </Link>
 
-          <div className="flex items-center gap-6 text-sm text-white/40">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-white/60">
             <Link href="#features" className="hover:text-white transition-colors">
               Features
             </Link>
@@ -540,7 +481,7 @@ export default async function Home() {
             </Link>
           </div>
 
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-white/60">
             © {new Date().getFullYear()} SecureGate. All rights reserved.
           </p>
         </div>
